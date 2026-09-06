@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Connect — Civic Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#home">
+      <span class="brand-mark">CC</span>
+      <span class="brand-copy"><strong>Community Connect</strong><small>CIVIC INTELLIGENCE PLATFORM</small></span>
+    </a>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#report">Report</a>
+      <a href="#issues">Explore Issues</a>
+      <a href="#about">About</a>
+    </nav>
+    <button class="btn btn-primary" onclick="openReport()"><span>＋</span> Report Issue</button>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> COMMUNITY-POWERED CIVIC ACTION</div>
+        <h1>Make your city<br><span>better, together.</span></h1>
+        <p>Report local problems, bring your community together, and turn everyday observations into visible action.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-large" onclick="openReport()">＋ Report an Issue</button>
+          <a class="btn btn-ghost btn-large" href="#issues">Explore Issues <span>↗</span></a>
+        </div>
+        <div class="trust-row">
+          <span>✓ Fast reporting</span>
+          <span>✓ Transparent tracking</span>
+          <span>✓ Community visibility</span>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <div class="card-heading">
+          <div><span class="micro-label">LIVE INCIDENT RADAR</span><strong>Community pulse</strong></div>
+          <span class="live"><i></i> LIVE</span>
+        </div>
+        <div id="realMap"></div>
+        <div class="radar-footer">
+          <span><b>3</b> active incidents</span>
+          <span class="cyan-text">Tap a marker to inspect</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="stat"><span class="stat-icon">◉</span><strong id="statTotal">0</strong><span>Total Reports</span></div>
+      <div class="stat"><span class="stat-icon amber">◌</span><strong id="statPending">0</strong><span>Pending</span></div>
+      <div class="stat"><span class="stat-icon blue">◒</span><strong id="statProgress">0</strong><span>In Progress</span></div>
+      <div class="stat"><span class="stat-icon green">✓</span><strong id="statResolved">0</strong><span>Resolved</span></div>
+    </section>
+
+    <section id="report" class="section split-section">
+      <div class="section-intro">
+        <span class="section-kicker">01 / REPORT</span>
+        <h2>Turn a local problem into a <span>visible action.</span></h2>
+        <p class="muted">Share what you see. Your report becomes part of a community-wide civic signal that can be tracked from report to resolution.</p>
+        <div class="steps">
+          <div class="step"><b>01</b><div><strong>Report</strong><p>Add a title, category, location and description.</p></div></div>
+          <div class="step"><b>02</b><div><strong>Track</strong><p>Follow the issue through its current status.</p></div></div>
+          <div class="step"><b>03</b><div><strong>Resolve</strong><p>Keep the community informed as work progresses.</p></div></div>
+        </div>
+      </div>
+
+      <div class="form-card" id="reportCard">
+        <div class="form-title"><div><span class="micro-label">QUICK REPORT</span><h3>What needs attention?</h3></div><span class="form-badge">DEMO</span></div>
+        <form id="reportForm">
+          <label>Issue title
+            <input id="title" required maxlength="70" placeholder="e.g. Broken streetlight near park" />
+          </label>
+          <div class="form-grid">
+            <label>Category
+              <select id="category" required>
+                <option value="Road">Road</option><option value="Garbage">Garbage</option><option value="Streetlight">Streetlight</option><option value="Water">Water</option><option value="Other">Other</option>
+              </select>
+            </label>
+            <label>Location
+              <input id="location" required placeholder="Area / landmark" />
+            </label>
+          </div>
+          <label>Description
+            <textarea id="description" required maxlength="400" rows="4" placeholder="Describe what is happening..."></textarea>
+          </label>
+          <label class="upload-field">Photo <span>OPTIONAL</span>
+            <input id="photo" type="file" accept="image/*" />
+          </label>
+          <button class="btn btn-primary full btn-large" type="submit">Submit Civic Report <span>→</span></button>
+          <p class="form-note">Demo mode · Reports are stored in your browser using localStorage.</p>
+        </form>
+      </div>
+    </section>
+
+    <section id="issues" class="section">
+      <div class="section-head">
+        <div><span class="section-kicker">02 / EXPLORE</span><h2>Community <span>issues.</span></h2></div>
+        <button class="btn btn-ghost" onclick="resetDemo()">Reset Demo Data</button>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap"><span>⌕</span><input id="searchInput" placeholder="Search issues, areas..." oninput="renderIssues()" /></div>
+        <select id="filterStatus" onchange="renderIssues()"><option value="All">All status</option><option>Reported</option><option>In Progress</option><option>Resolved</option></select>
+        <select id="filterCategory" onchange="renderIssues()"><option value="All">All categories</option><option>Road</option><option>Garbage</option><option>Streetlight</option><option>Water</option><option>Other</option></select>
+      </div>
+      <div id="issuesList" class="issues-grid"></div>
+      <div id="emptyState" class="empty hidden">No reports match your search.</div>
+    </section>
+
+    <section id="about" class="section about">
+      <div><span class="section-kicker">03 / ABOUT</span><h2>Civic problems deserve <span>civic visibility.</span></h2></div>
+      <p>Community Connect is a student-friendly prototype for reporting everyday civic problems. It demonstrates a public reporting workflow, issue tracking, and a community-focused dashboard without requiring a server for the demo.</p>
+    </section>
+  </main>
+
+  <footer class="footer"><span>COMMUNITY CONNECT</span><span>REPORT · TRACK · IMPROVE</span></footer>
+
+  <div id="modal" class="modal hidden"><div class="modal-backdrop" onclick="closeModal()"></div><div class="modal-card"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
+  <div id="toast" class="toast"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
